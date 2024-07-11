@@ -12,11 +12,16 @@ type VM interface {
 	FS() fs.FS
 	Templ() []string
 	Data() VM
+	Title() string
+}
+
+type Root interface {
+	Execute(w http.ResponseWriter)
 }
 
 func New[T VM](fs fs.FS, title string, data T) *rootModel {
 	return &rootModel{
-		Title: title,
+		title: title,
 		data:  data,
 		fs:    fs,
 	}
@@ -53,7 +58,7 @@ func allFSs(vm VM) []fs.FS {
 }
 
 type rootModel struct {
-	Title string
+	title string
 	data  VM
 	fs    fs.FS
 }
@@ -61,14 +66,19 @@ type rootModel struct {
 func (vm *rootModel) Data() VM        { return vm.data }
 func (vm *rootModel) Templ() []string { return []string{"index.html"} }
 func (vm *rootModel) FS() fs.FS       { return vm.fs }
+func (vm *rootModel) Title() string   { return vm.title }
 
 type baseModel struct {
 	fs    fs.FS
+	title string
 	paths []string
 }
 
 // If the viewmodel has values it is not basic
-func Basic(fs fs.FS, paths ...string) *baseModel { return &baseModel{paths: paths, fs: fs} }
-func (vm *baseModel) Templ() []string            { return vm.paths }
-func (vm *baseModel) Data() VM                   { return nil }
-func (vm *baseModel) FS() fs.FS                  { return vm.fs }
+func Basic(fs fs.FS, title string, paths ...string) *baseModel {
+	return &baseModel{paths: paths, title: title, fs: fs}
+}
+func (vm *baseModel) Templ() []string { return vm.paths }
+func (vm *baseModel) Data() VM        { return nil }
+func (vm *baseModel) FS() fs.FS       { return vm.fs }
+func (vm *baseModel) Title() string   { return vm.title }
