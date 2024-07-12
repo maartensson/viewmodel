@@ -16,7 +16,7 @@ type VM interface {
 }
 
 func New[T VM](fs fs.FS, title string, data T) Root {
-	return Raw(fs, &rootModel{
+	return Raw("index", fs, &rootModel{
 		title: title,
 		data:  data,
 		fs:    fs,
@@ -73,8 +73,8 @@ type Root interface {
 	Execute(w http.ResponseWriter)
 }
 
-func Raw[T VM](fs fs.FS, data T) Root {
-	return &raw{inner: data, fs: fs}
+func Raw[T VM](name string, fs fs.FS, data T) Root {
+	return &raw{inner: data, fs: fs, name: name}
 }
 
 func (raw *raw) Execute(w http.ResponseWriter) {
