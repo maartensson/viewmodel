@@ -1,2 +1,4 @@
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/mamaart/mergefs v0.0.1 h1:f0vqLy6/RpKWPScwrCACrMXFpo/2eBUU5YzXDVwCv2w=
 github.com/mamaart/mergefs v0.0.1/go.mod h1:X6sJDURNegQEiqOepunZ3rz9HISQJjHT1XKsDehCRTg=
