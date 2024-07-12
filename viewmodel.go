@@ -15,32 +15,12 @@ type VM interface {
 	Title() string
 }
 
-type Root interface {
-	Execute(w http.ResponseWriter)
-}
-
-func New[T VM](fs fs.FS, title string, data T) *rootModel {
-	return &rootModel{
+func New[T VM](fs fs.FS, title string, data T) Root {
+	return Raw(fs, &rootModel{
 		title: title,
 		data:  data,
 		fs:    fs,
-	}
-}
-
-func (vm *rootModel) Execute(w http.ResponseWriter) {
-	templ, err := template.
-		New("index").
-		Funcs(template.FuncMap{
-			"safeHTML": func(s string) template.HTML { return template.HTML(s) },
-		}).
-		ParseFS(mergefs.Merge(allFSs(vm)), allPaths(vm)...)
-	if err != nil {
-		panic(err)
-	}
-
-	if err := templ.Execute(w, &vm); err != nil {
-		panic(err)
-	}
+	})
 }
 
 func allPaths(vm VM) []string {
@@ -82,3 +62,33 @@ func (vm *baseModel) Templ() []string { return vm.paths }
 func (vm *baseModel) Data() VM        { return nil }
 func (vm *baseModel) FS() fs.FS       { return vm.fs }
 func (vm *baseModel) Title() string   { return vm.title }
+
+type raw struct {
+	name  string
+	fs    fs.FS
+	inner VM
+}
+
+type Root interface {
+	Execute(w http.ResponseWriter)
+}
+
+func Raw[T VM](fs fs.FS, data T) Root {
+	return &raw{inner: data, fs: fs}
+}
+
+func (raw *raw) Execute(w http.ResponseWriter) {
+	templ, err := template.
+		New(raw.name).
+		Funcs(template.FuncMap{
+			"safeHTML": func(s string) template.HTML { return template.HTML(s) },
+		}).
+		ParseFS(mergefs.Merge(allFSs(raw.inner)), allPaths(raw.inner)...)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := templ.Execute(w, &raw.inner); err != nil {
+		panic(err)
+	}
+}
