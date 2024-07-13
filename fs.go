@@ -1,7 +1,6 @@
 package viewmodel
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -81,7 +80,6 @@ func Merge(fss []fs.FS) (fs.FS, []string) {
 		}
 
 	}
-	fmt.Println(files)
 	return mfs{fss: fsys}, files
 }
 
