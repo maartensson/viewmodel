@@ -101,7 +101,9 @@ func (mfs mfs) Open(name string) (fs.File, error) {
 		return nil, os.ErrNotExist
 	}
 
-	f, err := fs.Open(name)
+	path := filepath.Join(dirs[1:]...)
+
+	f, err := fs.Open(path)
 	if err != nil {
 		return nil, os.ErrNotExist
 	}
