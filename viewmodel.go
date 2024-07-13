@@ -9,40 +9,18 @@ import (
 type VM interface {
 	FS() fs.FS
 	Data() VM
-	Title() string
 }
 
-func New[T VM](fs fs.FS, title string, data T) Root {
-	return Raw("index", fs, &rootModel{
-		title: title,
-		data:  data,
-		fs:    fs,
-	})
+func New[T VM](name string, fs fs.FS, data T) Root {
+	return &raw{inner: data, fs: fs, name: name}
 }
 
-type rootModel struct {
-	title string
-	data  VM
-	fs    fs.FS
-}
+// If the viewmodel has NO values it is basic
+type baseModel struct{ fs fs.FS }
 
-func (vm *rootModel) Data() VM      { return vm.data }
-func (vm *rootModel) FS() fs.FS     { return vm.fs }
-func (vm *rootModel) Title() string { return vm.title }
-
-type baseModel struct {
-	fs    fs.FS
-	title string
-	paths []string
-}
-
-// If the viewmodel has values it is not basic
-func Basic(fs fs.FS, title string, paths ...string) *baseModel {
-	return &baseModel{paths: paths, title: title, fs: fs}
-}
-func (vm *baseModel) Data() VM      { return nil }
-func (vm *baseModel) FS() fs.FS     { return vm.fs }
-func (vm *baseModel) Title() string { return vm.title }
+func Basic(fs fs.FS) *baseModel { return &baseModel{fs: fs} }
+func (vm *baseModel) Data() VM  { return nil }
+func (vm *baseModel) FS() fs.FS { return vm.fs }
 
 type raw struct {
 	name  string
@@ -50,13 +28,7 @@ type raw struct {
 	inner VM
 }
 
-type Root interface {
-	Execute(w http.ResponseWriter)
-}
-
-func Raw[T VM](name string, fs fs.FS, data T) Root {
-	return &raw{inner: data, fs: fs, name: name}
-}
+type Root interface{ Execute(w http.ResponseWriter) }
 
 func (raw *raw) Execute(w http.ResponseWriter) {
 	fs, paths := Merge(allFSs(raw.inner))
