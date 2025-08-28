@@ -1,8 +1,5 @@
-module github.com/mamaart/viewmodel
+module github.com/maartensson/viewmodel
 
-go 1.21.9
+go 1.24.5
 
-require (
-	github.com/google/uuid v1.6.0
-	github.com/mamaart/mergefs v0.0.1
-)
+require github.com/google/uuid v1.6.0
