@@ -16,11 +16,14 @@ func New[T VM](name string, fs fs.FS, data T) Root {
 }
 
 // If the viewmodel has NO values it is basic
-type baseModel struct{ fs fs.FS }
+type baseModel struct {
+	fs     fs.FS
+	Values any
+}
 
-func Basic(fs fs.FS) *baseModel { return &baseModel{fs: fs} }
-func (vm *baseModel) Data() VM  { return nil }
-func (vm *baseModel) FS() fs.FS { return vm.fs }
+func Basic(fs fs.FS, values any) *baseModel { return &baseModel{fs: fs, Values: values} }
+func (vm *baseModel) Data() VM              { return nil }
+func (vm *baseModel) FS() fs.FS             { return vm.fs }
 
 type raw struct {
 	name  string
